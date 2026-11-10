@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Financeiro | Terras Alphaville Teresina</title>
+  <meta name="description" content="Simulador de financiamento de lotes Terras Alphaville Teresina - 72x com correção IPCA">
+  <style>
+    :root {
+      --primary: #1a5f2a;
+      --primary-dark: #0f3d1a;
+      --primary-light: #2d8a45;
+      --accent: #c9a227;
+      --bg: #f4f7f5;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #5a6a5e;
+      --border: #dce5df;
+      --success: #0d7a3a;
+      --danger: #b91c1c;
+      --shadow: 0 4px 20px rgba(26, 95, 42, 0.08);
+      --radius: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      background-image: 
+        linear-gradient(rgba(15, 40, 20, 0.72), rgba(15, 40, 20, 0.78)),
+        url('https://i0.wp.com/hubimobiliario.com/wp-content/uploads/2025/09/unnamed-2025-09-24T214649761.jpg?fit=1600%2C1067&ssl=1');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+
+    .header {
+      background: linear-gradient(135deg, rgba(15, 61, 26, 0.92) 0%, rgba(26, 95, 42, 0.88) 60%, rgba(45, 138, 69, 0.85) 100%);
+      color: white;
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 60%;
+      height: 200%;
+      background: rgba(255,255,255,0.04);
+      transform: rotate(25deg);
+    }
+
+    .header h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      position: relative;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      opacity: 0.92;
+      margin-top: 0.35rem;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #1a1a1a;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      margin-top: 0.6rem;
+      letter-spacing: 0.03em;
+      position: relative;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title span {
+      font-size: 1.2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    .input-wrap .suffix {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      background: #fafcfb;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-wrap input {
+      padding-left: 2.4rem;
+    }
+
+    .input-wrap.has-suffix input {
+      padding-right: 2.6rem;
+      padding-left: 0.9rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 95, 42, 0.15);
+      background: white;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .btn-simular {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.9rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-simular:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(26, 95, 42, 0.3);
+    }
+
+    .btn-simular:active {
+      transform: translateY(0);
+    }
+
+    /* Results */
+    .results {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .results.visible {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem;
+    }
+
+    @media (min-width: 700px) {
+      .result-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .result-item {
+      background: #f8fbf9;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+
+    .result-item.highlight {
+      background: linear-gradient(135deg, #e8f5ec 0%, #d4edda 100%);
+      border-color: #a3d4b0;
+    }
+
+    .result-item.total {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: white;
+      border: none;
+      grid-column: 1 / -1;
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .result-item.total .result-label {
+      color: rgba(255,255,255,0.85);
+    }
+
+    .result-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .result-item.highlight .result-value {
+      color: var(--success);
+      font-size: 1.4rem;
+    }
+
+    .result-item.total .result-value {
+      color: white;
+      font-size: 1.55rem;
+    }
+
+    .result-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .result-item.total .result-sub {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Summary table */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      padding: 0.65rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .summary-table th {
+      background: #f0f5f1;
+      font-weight: 600;
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .summary-table td:last-child,
+    .summary-table th:last-child {
+      text-align: right;
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+      font-weight: 700;
+      background: #f8fbf9;
+    }
+
+    /* Notes */
+    .notes {
+      background: rgba(255, 251, 235, 0.97);
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-size: 0.85rem;
+      color: #78350f;
+      line-height: 1.55;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .notes strong {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: #92400e;
+    }
+
+    .notes ul {
+      margin: 0.4rem 0 0 1.1rem;
+    }
+
+    .notes li {
+      margin-bottom: 0.25rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .ipca-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #e8f5ec;
+      color: var(--primary-dark);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      margin-top: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Simulador Financeiro</h1>
+    <p>Terras Alphaville — Teresina / PI</p>
+    <div class="badge">72x + IPCA</div>
+  </header>
+
+  <div class="container">
+    <!-- FORMULÁRIO -->
+    <div class="card">
+      <div class="card-title"><span>📋</span> Dados da Simulação</div>
+      
+      <form id="simForm" onsubmit="return false;">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="valorLote">Valor Total do Lote</label>
+            <div class="input-wrap">
+              <span class="prefix">R$</span>
+              <input type="number" id="valorLote" value="320000" min="50000" step="1000" required>
+            </div>
+            <div class="hint">Valor de tabela do lote (ex: R$ 264.000 a R$ 450.000)</div>
+          </div>
+
+          <div class="form-group">
+            <label for="percEntrada">Entrada</label>
+            <div class="input-wrap has-suffix">
+              <input type="number" id="percEntrada" value="10" min="0" max="50" step="0.5">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="percTaxas">Taxas Extras</label>
+            <div class="input-wrap has-suffix">
+              <input type="number" id="percTaxas" value="13" min="0" max="30" step="0.5">
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Cartório, ITBI, documentação etc.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="numParcelas">Nº de Parcelas</label>
+            <div class="input-wrap has-suffix">
+              <input type="number" id="numParcelas" value="72" min="12" max="120" step="1">
+              <span class="suffix">x</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="taxaIPCA">Taxa Anual Estimada (IPCA)</label>
+            <div class="input-wrap has-suffix">
+              <input type="number" id="taxaIPCA" value="4.6" min="0" max="15" step="0.1">
+              <span class="suffix">% a.a.</span>
+            </div>
+            <div class="hint">IPCA 12 meses atual ≈ 4,58% (set/2026)</div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-simular" onclick="calcular()">Calcular Simulação</button>
+      </form>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="results" class="results">
+      <div class="card">
+        <div class="card-title"><span>💰</span> Resumo da Proposta</div>
+        
+        <div class="result-grid" id="resultCards">
+          <!-- preenchido via JS -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>📊</span> Detalhamento Financeiro</div>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notes">
+        <strong>⚠️ Observações importantes para o cliente:</strong>
+        <ul>
+          <li>As parcelas são calculadas pelo <strong>Sistema Price</strong> (parcelas fixas em valor nominal) usando a taxa anual informada como aproximação da correção pelo IPCA.</li>
+          <li>Em contratos reais da Alphaville, o valor das parcelas costuma ser <strong>reajustado mensalmente pelo IPCA</strong>. Esta simulação usa taxa fixa para facilitar a comparação e o planejamento.</li>
+          <li>As <strong>taxas extras (13%)</strong> incluem estimativa de custos de cartório, ITBI, escritura e taxas administrativas. Valores reais podem variar conforme a tabela vigente e o cartório.</li>
+          <li>Esta é uma ferramenta de apoio comercial. A proposta formal deve ser gerada pelo sistema oficial da Alphaville Urbanismo.</li>
+          <li>IPCA de referência (últimos 12 meses até set/2026): <strong>4,58%</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    Simulador desenvolvido para uso comercial · Terras Alphaville Teresina<br>
+    <span style="font-size:0.75rem;">Não substitui a tabela oficial da incorporadora</span>
+  </footer>
+
+  <script>
+    // Formatação de moeda brasileira
+    function formatBRL(valor) {
+      return valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatNumber(valor) {
+      return valor.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    // Cálculo da parcela pelo Sistema Price
+    function calcularParcela(pv, taxaMensal, n) {
+      if (taxaMensal === 0) return pv / n;
+      const fator = Math.pow(1 + taxaMensal, n);
+      return pv * (taxaMensal * fator) / (fator - 1);
+    }
+
+    function calcular() {
+      const valorLote = parseFloat(document.getElementById('valorLote').value) || 0;
+      const percEntrada = parseFloat(document.getElementById('percEntrada').value) || 0;
+      const percTaxas = parseFloat(document.getElementById('percTaxas').value) || 0;
+      const n = parseInt(document.getElementById('numParcelas').value) || 72;
+      const taxaAnual = parseFloat(document.getElementById('taxaIPCA').value) || 0;
+
+      if (valorLote <= 0) {
+        alert('Informe o valor do lote.');
+        return;
+      }
+
+      // Cálculos principais
+      const valorEntrada = valorLote * (percEntrada / 100);
+      const valorTaxas = valorLote * (percTaxas / 100);
+      const valorFinanciado = valorLote - valorEntrada;
+      const taxaMensal = (taxaAnual / 100) / 12;
+      const valorParcela = calcularParcela(valorFinanciado, taxaMensal, n);
+      const totalParcelas = valorParcela * n;
+      const totalJuros = totalParcelas - valorFinanciado;
+      const totalGeral = valorEntrada + valorTaxas + totalParcelas;
+      const custoEfetivo = ((totalGeral / valorLote) - 1) * 100;
+
+      // Cards de resultado
+      const cardsHtml = `
+        <div class="result-item">
+          <div class="result-label">Entrada (${percEntrada}%)</div>
+          <div class="result-value">${formatBRL(valorEntrada)}</div>
+        </div>
+        <div class="result-item">
+          <div class="result-label">Taxas Extras (${percTaxas}%)</div>
+          <div class="result-value">${formatBRL(valorTaxas)}</div>
+        </div>
+        <div class="result-item">
+          <div class="result-label">Valor Financiado</div>
+          <div class="result-value">${formatBRL(valorFinanciado)}</div>
+          <div class="result-sub">${100 - percEntrada}% do lote</div>
+        </div>
+        <div class="result-item highlight">
+          <div class="result-label">Parcela Mensal</div>
+          <div class="result-value">${formatBRL(valorParcela)}</div>
+          <div class="result-sub">${n}x fixas (Price)</div>
+        </div>
+        <div class="result-item">
+          <div class="result-label">Total de Juros</div>
+          <div class="result-value">${formatBRL(totalJuros)}</div>
+          <div class="result-sub">≈ ${formatNumber((totalJuros / valorFinanciado) * 100)}% do financiado</div>
+        </div>
+        <div class="result-item total">
+          <div class="result-label">Investimento Total Estimado</div>
+          <div class="result-value">${formatBRL(totalGeral)}</div>
+          <div class="result-sub">Entrada + Taxas + ${n} parcelas · Custo efetivo ≈ ${formatNumber(custoEfetivo)}%</div>
+        </div>
+      `;
+      document.getElementById('resultCards').innerHTML = cardsHtml;
+
+      // Tabela detalhada
+      const rows = [
+        ['Valor do Lote', formatBRL(valorLote)],
+        [`Entrada (${percEntrada}%)`, formatBRL(valorEntrada)],
+        [`Taxas Extras (${percTaxas}%)`, formatBRL(valorTaxas)],
+        ['Saldo a Financiar', formatBRL(valorFinanciado)],
+        [`Parcela Mensal (${n}x)`, formatBRL(valorParcela)],
+        ['Total pago em parcelas', formatBRL(totalParcelas)],
+        ['Total de juros estimados', formatBRL(totalJuros)],
+        ['Investimento Total', formatBRL(totalGeral)]
+      ];
+
+      document.getElementById('summaryBody').innerHTML = rows.map((r, i) => {
+        const isLast = i === rows.length - 1;
+        return `<tr${isLast ? ' style="font-weight:700"' : ''}><td>${r[0]}</td><td>${r[1]}</td></tr>`;
+      }).join('');
+
+      // Mostrar resultados
+      document.getElementById('results').classList.add('visible');
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Calcular automaticamente ao carregar e ao mudar valores
+    document.addEventListener('DOMContentLoaded', () => {
+      calcular();
+      ['valorLote', 'percEntrada', 'percTaxas', 'numParcelas', 'taxaIPCA'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calcular);
+      });
+    });
+  </script>
+</body>
+</html>
